@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LLM Helper</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #response { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <h2>Ask Me Anything</h2>
+  <input id="userInput" type="text" placeholder="Type your question..." style="width: 300px;">
+  <button onclick="sendRequest()">Submit</button>
+  <div id="response">Response will appear here.</div>
+
+  <script>
+    async function sendRequest() {
+      const input = document.getElementById("userInput").value;
+      const responseDiv = document.getElementById("response");
+      responseDiv.innerHTML = "Loading...";
+
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer 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"
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: input }],
+            max_tokens: 500
+          })
+        });
+        const data = await res.json();
+        if (data.choices && data.choices[0]) {
+          responseDiv.innerHTML = data.choices[0].message.content.replace(/\n/g, "<br>");
+        } else {
+          responseDiv.innerHTML = "Error: No response from server.";
+        }
+      } catch (error) {
+        responseDiv.innerHTML = "Error: " + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
